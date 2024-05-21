@@ -3,12 +3,11 @@ import time
 import mysql.connector
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from datetime import datetime
 import logging
 import requests
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
 # Set up logging
@@ -89,6 +88,20 @@ def mimic_human_behavior(driver):
     time.sleep(2)
 
 
+# Function to download and replace image URLs
+def download_and_replace_images(soup, base_dir, headers):
+    for img in soup.find_all('img'):
+        src = img.get('src')
+        if src and not src.startswith('http'):
+            img_url = urljoin('https://www.sigmaaldrich.com', src)
+            img_content = requests.get(img_url, headers=headers).content
+            img_path = os.path.join(base_dir, 'images', os.path.basename(urlparse(img_url).path))
+            with open(img_path, 'wb') as f:
+                f.write(img_content)
+            img['src'] = f'https://azma.market/content/{os.path.relpath(img_path, base_dir)}'
+    return str(soup)
+
+
 def scrape_data(url, attempt_number, url_id, cursor, conn):
     logger.debug(f'Scraping data from URL: {url}')
     driver.get(url)
@@ -115,11 +128,23 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
     pdf_url = None
     pdf_content = None
     product_uid = None
+    image_url = None  # Ensure image_url is defined here
+
     if spec_sheet_link:
         relative_pdf_url = spec_sheet_link.get('href')
         pdf_url = urljoin('https://www.sigmaaldrich.com', relative_pdf_url)
         pdf_content = requests.get(pdf_url, headers=headers).content
         logger.debug(f'PDF content length: {len(pdf_content)} bytes')
+
+    # Fetch UID for the product
+    cursor.execute("SELECT uid FROM sitemap_prod_us_en_1 WHERE url = %s", (url,))
+    result = cursor.fetchone()
+    if result:
+        product_uid = result[0]
+
+    # Save all captured data
+    base_dir = setup_directory(attempt_number, url_id)
+    pdf_path = save_data(base_dir, html, pdf_url, pdf_content, product_uid)
 
     # Function to keep specific tags
     def keep_specific_tags(element, tags_to_keep):
@@ -129,13 +154,16 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
         return str(element)
 
     # Tags to keep
-    tags_to_keep = ['h3', 'p', 'br']
+    tags_to_keep = ['h3', 'p', 'br', 'div']
 
     # Extract product data with checks
     product_name = soup.select_one('span#product-name').get_text(strip=True) if soup.select_one(
         'span#product-name') else ''
     image_element = soup.select_one('img#active-image')
-    image_url = urljoin('https://www.sigmaaldrich.com', image_element.get('src')) if image_element else ''
+    if image_element:
+        image_url = urljoin('https://www.sigmaaldrich.com', image_element.get('src'))
+    logger.debug(f'image_url: {image_url}')
+
     size_select = [e.get_text(strip=True) for e in soup.select('.jss449 span.jss441')] if soup.select(
         '.jss449 span.jss441') else []
     synonyms = [e.get_text(strip=True) for e in soup.select('.jss167 span')] if soup.select('.jss167 span') else []
@@ -158,10 +186,16 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
 
     # Extract description while keeping specific tags
     description_element = soup.select_one('[data-testid="pdp-description"]')
-    description = keep_specific_tags(description_element, tags_to_keep) if description_element else ''
+    description_html = keep_specific_tags(description_element, tags_to_keep) if description_element else ''
+    description = download_and_replace_images(BeautifulSoup(description_html, 'html.parser'), base_dir,
+                                              headers) if description_html else ''
 
-    safety_information = str(soup.select_one('#pdp-safetyInfo .jss231 div.MuiContainer-root')) if soup.select_one(
-        '#pdp-safetyInfo .jss231 div.MuiContainer-root') else ''
+    # Extract safety information while keeping specific tags and downloading images
+    safety_info_element = soup.select_one('[data-testid="pdp-safety-info"]')
+    safety_info_html = keep_specific_tags(safety_info_element, tags_to_keep) if safety_info_element else ''
+    safety_information = download_and_replace_images(BeautifulSoup(safety_info_html, 'html.parser'), base_dir,
+                                                     headers) if safety_info_html else ''
+
     specification_sheet = pdf_url
     related_categories = [e.get_text(strip=True) for e in soup.select('.MuiGrid-grid-md-3 div')] if soup.select(
         '.MuiGrid-grid-md-3 div') else []
@@ -172,23 +206,17 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
     thumbs_images = str(soup.select_one('.jss202 div.slider-list')) if soup.select_one(
         '.jss202 div.slider-list') else ''
 
-    # Fetch UID for the product
-    cursor.execute("SELECT uid FROM sitemap_prod_us_en_1 WHERE url = %s", (url,))
-    result = cursor.fetchone()
-    if result:
-        product_uid = result[0]
-
-    # Save all captured data
-    base_dir = setup_directory(attempt_number, url_id)
-    pdf_path = save_data(base_dir, html, pdf_url, pdf_content, product_uid)
-
     # Save active image
     image_path = None
     if image_url and product_uid:
+        logger.debug(f'Downloading image from {image_url}')
         image_content = requests.get(image_url, headers=headers).content
         image_path = os.path.join(base_dir, 'images', f'{product_uid}.png')
         with open(image_path, 'wb') as f:
             f.write(image_content)
+        logger.debug(f'Saved image to {image_path}')
+    else:
+        logger.warning(f'image_url or product_uid is not set. image_url: {image_url}, product_uid: {product_uid}')
 
     # Insert product data into the relational table
     if product_uid:
@@ -202,11 +230,11 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         values = (
-            product_name, image_path, str(size_select), str(synonyms), linear_formula,
+            product_name, image_path, ', '.join(size_select), ', '.join(synonyms), linear_formula,
             cas_number, ec_number, molecular_weight, beilstein, mdl_number,
             pubchem_substance_id, nacres, properties, description,
-            safety_information, pdf_path, str(related_categories),
-            code, brand_image, str(code_sub), thumbs_images, product_uid
+            safety_information, pdf_path, ', '.join(related_categories),
+            code, brand_image, ', '.join(code_sub), thumbs_images, product_uid
         )
         cursor.execute(insert_query, values)
         conn.commit()
@@ -221,10 +249,10 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
     else:
         updated_history = f"{now}, "
     update_query = f"""
-        UPDATE sitemap_prod_us_en_1
-        SET last_scraped = %s, response = %s, scraped = 1, scrape_history = %s
-        WHERE id = %s
-    """
+            UPDATE sitemap_prod_us_en_1
+            SET last_scraped = %s, response = %s, scraped = 1, scrape_history = %s
+            WHERE id = %s
+        """
     cursor.execute(update_query, (now, current_url, updated_history, url_id))
     conn.commit()
 
