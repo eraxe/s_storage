@@ -121,6 +121,16 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
         pdf_content = requests.get(pdf_url, headers=headers).content
         logger.debug(f'PDF content length: {len(pdf_content)} bytes')
 
+    # Function to keep specific tags
+    def keep_specific_tags(element, tags_to_keep):
+        for tag in element.find_all(True):  # Find all tags
+            if tag.name not in tags_to_keep:
+                tag.unwrap()  # Remove the tag but keep its contents
+        return str(element)
+
+    # Tags to keep
+    tags_to_keep = ['h3', 'p', 'br']
+
     # Extract product data with checks
     product_name = soup.select_one('span#product-name').get_text(strip=True) if soup.select_one(
         'span#product-name') else ''
@@ -145,8 +155,11 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
     nacres = soup.select_one('div.jss171:nth-of-type(6) div:nth-of-type(2)').get_text(strip=True) if soup.select_one(
         'div.jss171:nth-of-type(6) div:nth-of-type(2)') else ''
     properties = str(soup.select_one('div.jss235')) if soup.select_one('div.jss235') else ''
-    description = str(soup.select_one('#pdp-description--div .jss231 div.MuiContainer-root')) if soup.select_one(
-        '#pdp-description--div .jss231 div.MuiContainer-root') else ''
+
+    # Extract description while keeping specific tags
+    description_element = soup.select_one('[data-testid="pdp-description"]')
+    description = keep_specific_tags(description_element, tags_to_keep) if description_element else ''
+
     safety_information = str(soup.select_one('#pdp-safetyInfo .jss231 div.MuiContainer-root')) if soup.select_one(
         '#pdp-safetyInfo .jss231 div.MuiContainer-root') else ''
     specification_sheet = pdf_url
