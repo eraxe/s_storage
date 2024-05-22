@@ -5,10 +5,11 @@ from datetime import datetime
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import logging
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from database import connect_to_database, fetch_urls, update_scrape_history
-from utils import setup_directory, save_data, mimic_human_behavior, download_and_replace_images, keep_specific_tags
+from utils import setup_directory, save_data, mimic_human_behavior, download_and_replace_images, keep_specific_tags, \
+    download_and_replace_safety_images
 from scraper_conf import db_config, options, service
 from logging_setup import setup_logging
 
@@ -86,8 +87,8 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
 
     safety_info_element = soup.select_one('[data-testid="pdp-safety-info"]')
     safety_info_html = keep_specific_tags(safety_info_element, tags_to_keep) if safety_info_element else ''
-    safety_information = download_and_replace_images(BeautifulSoup(safety_info_html, 'html.parser'), base_dir,
-                                                     headers) if safety_info_html else ''
+    safety_information = download_and_replace_safety_images(BeautifulSoup(safety_info_html, 'html.parser'), base_dir,
+                                                            headers) if safety_info_html else ''
 
     specification_sheet = pdf_url
     related_categories = [e.get_text(strip=True) for e in soup.select('.MuiGrid-grid-md-3 div')] if soup.select(
@@ -169,7 +170,6 @@ def main():
     driver.quit()
     cursor.close()
     conn.close()
-
 
 if __name__ == '__main__':
     main()

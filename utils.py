@@ -49,3 +49,51 @@ def keep_specific_tags(element, tags_to_keep):
         if tag.name not in tags_to_keep:
             tag.unwrap()
     return str(element)
+
+
+def download_and_replace_images(soup, base_dir, headers):
+    for img in soup.find_all('img'):
+        src = img.get('src')
+        if src and not src.startswith('http'):
+            img_url = urljoin('https://www.sigmaaldrich.com', src)
+            img_content = requests.get(img_url, headers=headers).content
+            img_path = os.path.join(base_dir, 'images', os.path.basename(urlparse(img_url).path))
+            with open(img_path, 'wb') as f:
+                f.write(img_content)
+            img['src'] = f'https://azma.market/content/{os.path.relpath(img_path, base_dir)}'
+    return str(soup)
+
+
+def download_and_replace_safety_images(soup, base_dir, headers):
+    safety_dir = os.path.join(base_dir, 'safety')
+    os.makedirs(safety_dir, exist_ok=True)
+
+    for img in soup.find_all('img'):
+        src = img.get('src')
+        if src and not src.startswith('http'):
+            img_url = urljoin('https://www.sigmaaldrich.com', src)
+            img_name = os.path.basename(urlparse(img_url).path)
+            img_path = os.path.join(safety_dir, img_name)
+
+            if not os.path.exists(img_path):  # Check if the image already exists
+                img_content = requests.get(img_url, headers=headers).content
+                with open(img_path, 'wb') as f:
+                    f.write(img_content)
+
+            img['src'] = f'https://azma.market/content/safety/{img_name}'
+
+    # Convert the content to a table
+    table_html = '<table>'
+    for div in soup.select('div.MuiGrid-item'):
+        header = div.select_one('h3').get_text(strip=True)
+        content = []
+        for elem in div.select('div.jss311 p, div.jss311'):
+            if elem.find('img'):
+                content.append(str(elem))
+            else:
+                content.append(elem.get_text(strip=True))
+        content_html = ' '.join(content)
+        table_html += f'<tr><th>{header}</th><td>{content_html}</td></tr>'
+    table_html += '</table>'
+
+    return table_html
