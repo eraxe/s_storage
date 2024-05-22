@@ -221,14 +221,14 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
     # Insert product data into the relational table
     if product_uid:
         insert_query = f"""
-            INSERT INTO sitemap_prod_us_en_1_DATA (
-                product_name, image, size_select, synonyms, linear_formula, 
-                cas_number, ec_number, molecular_weight, beilstein, mdl_number, 
-                pubchem_substance_id, nacres, properties, description, 
-                safety_information, specification_sheet, related_categories, 
-                code, brand_image, code_sub, thumbs_images, uid
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
+                INSERT INTO sitemap_prod_us_en_1_DATA (
+                    product_name, image, size_select, synonyms, linear_formula, 
+                    cas_number, ec_number, molecular_weight, beilstein, mdl_number, 
+                    pubchem_substance_id, nacres, properties, description, 
+                    safety_information, specification_sheet, related_categories, 
+                    code, brand_image, code_sub, thumbs_images, uid
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
         values = (
             product_name, image_path, ', '.join(size_select), ', '.join(synonyms), linear_formula,
             cas_number, ec_number, molecular_weight, beilstein, mdl_number,
@@ -249,10 +249,10 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
     else:
         updated_history = f"{now}, "
     update_query = f"""
-            UPDATE sitemap_prod_us_en_1
-            SET last_scraped = %s, response = %s, scraped = 1, scrape_history = %s
-            WHERE id = %s
-        """
+                UPDATE sitemap_prod_us_en_1
+                SET last_scraped = %s, response = %s, scraped = 1, scrape_history = %s
+                WHERE id = %s
+            """
     cursor.execute(update_query, (now, current_url, updated_history, url_id))
     conn.commit()
 
