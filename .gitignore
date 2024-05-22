@@ -33,4 +33,4 @@ Thumbs.db
 nginx.conf
 scraper.log
 db.py
-.idea
+.idea/
