@@ -86,8 +86,7 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     description = download_and_replace_images(BeautifulSoup(description_html, 'html.parser'), headers) if description_html else ''
 
     safety_info_element = soup.select_one('[data-testid="pdp-safety-info"]')
-    safety_info_html = keep_specific_tags(safety_info_element, tags_to_keep) if safety_info_element else ''
-    safety_information = download_and_replace_safety_images(BeautifulSoup(safety_info_html, 'html.parser'), headers) if safety_info_html else ''
+    safety_information = download_and_replace_safety_images(safety_info_element, headers) if safety_info_element else ''
 
     specification_sheet = pdf_url
     related_categories = [e.get_text(strip=True) for e in soup.select('.MuiGrid-grid-md-3 div')] if soup.select(

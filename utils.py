@@ -82,25 +82,19 @@ def keep_specific_tags(element, tags_to_keep):
     return str(element)
 
 def download_and_replace_safety_images(soup, headers):
-    for img in soup.find_all('img'):
-        src = img.get('src')
-        if src and not src.startswith('http'):
-            img_url = urljoin('https://www.sigmaaldrich.com', src)
-            img_path = download_and_save_file(img_url, headers)
-            img['src'] = f'https://azma.market/content/safety/{os.path.relpath(img_path, "cdn")}'
-
-    # Convert the content to a table
     table_html = '<table>'
     for div in soup.select('div.MuiGrid-item'):
         header = div.select_one('h3').get_text(strip=True)
         content = []
-        for elem in div.select('div.jss311 p, div.jss311'):
+        for elem in div.select('div.jss304 img, div.jss305 a, div.jss305 p'):
             if elem.find('img'):
-                content.append(str(elem))
+                src = elem['src']
+                img_url = urljoin('https://www.sigmaaldrich.com', src)
+                img_path = download_and_save_file(img_url, headers)
+                content.append(f'<img src="https://azma.market/content/safety/{os.path.relpath(img_path, "cdn")}"/>')
             else:
                 content.append(elem.get_text(strip=True))
         content_html = ' '.join(content)
         table_html += f'<tr><th>{header}</th><td>{content_html}</td></tr>'
     table_html += '</table>'
-
     return table_html
