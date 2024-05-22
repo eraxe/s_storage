@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlparse
 
 from database import connect_to_database, fetch_urls, update_scrape_history
 from utils import setup_directory, save_data, mimic_human_behavior, download_and_replace_images, keep_specific_tags, \
-    download_and_replace_safety_images
+    download_and_replace_safety_images, save_html, save_pdf, download_and_save_file
 from scraper_conf import db_config, options, service
 from logging_setup import setup_logging
 
@@ -49,7 +49,8 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
         product_uid = result[0]
 
     base_dir = setup_directory(attempt_number, url_id)
-    pdf_path = save_data(base_dir, html, pdf_url, pdf_content, product_uid)
+    pdf_path = save_pdf(pdf_url, pdf_content, product_uid, headers)
+    save_html(base_dir, html)
 
     tags_to_keep = ['h3', 'p', 'br', 'div']
 
@@ -77,18 +78,16 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     pubchem_substance_id = soup.select_one('.jss173 a[target]').get_text(strip=True) if soup.select_one(
         '.jss173 a[target]') else ''
     nacres = soup.select_one('div.jss171:nth-of-type(6) div:nth-of-type(2)').get_text(strip=True) if soup.select_one(
-        'div.jss171:nth-of-type(6) div:nth-of-type(2)') else ''
+        'div.jss171:nth-of-type(6) div.jss173:nth-of-type(2)') else ''
     properties = str(soup.select_one('div.jss235')) if soup.select_one('div.jss235') else ''
 
     description_element = soup.select_one('[data-testid="pdp-description"]')
     description_html = keep_specific_tags(description_element, tags_to_keep) if description_element else ''
-    description = download_and_replace_images(BeautifulSoup(description_html, 'html.parser'), base_dir,
-                                              headers) if description_html else ''
+    description = download_and_replace_images(BeautifulSoup(description_html, 'html.parser'), headers) if description_html else ''
 
     safety_info_element = soup.select_one('[data-testid="pdp-safety-info"]')
     safety_info_html = keep_specific_tags(safety_info_element, tags_to_keep) if safety_info_element else ''
-    safety_information = download_and_replace_safety_images(BeautifulSoup(safety_info_html, 'html.parser'), base_dir,
-                                                            headers) if safety_info_html else ''
+    safety_information = download_and_replace_safety_images(BeautifulSoup(safety_info_html, 'html.parser'), headers) if safety_info_html else ''
 
     specification_sheet = pdf_url
     related_categories = [e.get_text(strip=True) for e in soup.select('.MuiGrid-grid-md-3 div')] if soup.select(
@@ -103,10 +102,7 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     image_path = None
     if image_url and product_uid:
         logger.debug(f'Downloading image from {image_url}')
-        image_content = requests.get(image_url, headers=headers).content
-        image_path = os.path.join(base_dir, 'images', f'{product_uid}.png')
-        with open(image_path, 'wb') as f:
-            f.write(image_content)
+        image_path = download_and_save_file(image_url, headers)
         logger.debug(f'Saved image to {image_path}')
     else:
         logger.warning(f'image_url or product_uid is not set. image_url: {image_url}, product_uid: {product_uid}')
@@ -144,7 +140,6 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     os.remove(os.path.join(base_dir, 'html', 'page.html'))
     return current_url
 
-
 def main():
     setup_logging()  # Ensure logging is set up once at the start
     conn, cursor = connect_to_database(db_config)
@@ -154,10 +149,10 @@ def main():
     driver = webdriver.Chrome(service=service, options=options)
 
     attempt_number = 1
-    attempt_base_dir = os.path.join('scrape_data', f'attempt_{attempt_number}')
+    attempt_base_dir = os.path.join('cdn', f'attempt_{attempt_number}')
     while os.path.exists(attempt_base_dir):
         attempt_number += 1
-        attempt_base_dir = os.path.join('scrape_data', f'attempt_{attempt_number}')
+        attempt_base_dir = os.path.join('cdn', f'attempt_{attempt_number}')
 
     for url_id, url in urls_to_scrape:
         try:
