@@ -9,10 +9,6 @@
 !utils.py
 !logging_setup.py
 
-# Allow any directories required for the project
-!scrape_data/
-!scraper.log
-
 # Ignore typical files and directories
 # Virtual environments
 venv/

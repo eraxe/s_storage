@@ -1995,3 +1995,20 @@ Stacktrace:
 2024-05-22 10:39:02,899 - DEBUG - Downloading image from https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/368/691/554e49d7-c733-4cf3-b87f-d2ef798fc0b0/640/554e49d7-c733-4cf3-b87f-d2ef798fc0b0.jpg
 2024-05-22 10:39:05,443 - DEBUG - Saved image to scrape_data/attempt_21/url_133/images/c6079.png
 2024-05-22 10:39:05,481 - ERROR - Error scraping https://www.sigmaaldrich.com/US/en/product/sigma/c6079: name 'now' is not defined
+2024-05-22 10:42:52,019 - DEBUG - Logging setup complete.
+2024-05-22 10:42:52,034 - INFO - Connected to the MySQL database.
+2024-05-22 10:42:52,172 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/mm/100337
+2024-05-22 10:42:52,172 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/mm/100337
+2024-05-22 10:46:06,582 - DEBUG - PDF content length: 289651 bytes
+2024-05-22 10:46:06,597 - DEBUG - Saving HTML content.
+2024-05-22 10:46:06,599 - DEBUG - Saving PDF content from https://www.sigmaaldrich.com/US/en/specification-sheet/SPEC/MDA/CHEM/1.00337/1003371000.
+2024-05-22 10:46:06,602 - DEBUG - image_url: https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/320/636/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50/640/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50.jpg
+2024-05-22 10:46:06,714 - DEBUG - Downloading image from https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/320/636/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50/640/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50.jpg
+2024-05-22 10:46:08,555 - DEBUG - Saved image to scrape_data/attempt_22/url_129/images/100337.png
+2024-05-22 10:46:08,588 - ERROR - Error scraping https://www.sigmaaldrich.com/US/en/product/mm/100337: name 'datetime' is not defined
+2024-05-22 10:46:08,589 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/mm/132381
+2024-05-22 10:46:08,589 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/mm/132381
+2024-05-22 10:49:37,815 - DEBUG - Logging setup complete.
+2024-05-22 10:49:37,827 - INFO - Connected to the MySQL database.
+2024-05-22 10:49:37,955 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/mm/100337
+2024-05-22 10:49:37,955 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/mm/100337

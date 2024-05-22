@@ -1,6 +1,6 @@
 import mysql.connector
 import logging
-
+from datetime import datetime
 logger = logging.getLogger('scraper')
 
 def connect_to_database(db_config):

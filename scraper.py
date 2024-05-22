@@ -6,30 +6,17 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import logging
 from urllib.parse import urljoin
+
 from database import connect_to_database, fetch_urls, update_scrape_history
 from utils import setup_directory, save_data, mimic_human_behavior, download_and_replace_images, keep_specific_tags
 from scraper_conf import db_config, options, service
 from logging_setup import setup_logging
+
 setup_logging()  # Ensure logging is set up once at the start
+
 logger = logging.getLogger('scraper')
-"""
-Project Structure:
-1. scraper.py
-   - Main Script: Orchestrates the scraping process, initializes the WebDriver, and manages the main loop for scraping URLs.
-   - Functions: scrape_data(), main()
-2. scraper_conf.py
-   - Configuration: Contains configuration for MySQL connection, Selenium options, and logging setup.
-   - Variables: db_config, options, service, logger
-3. database.py
-   - Database Operations: Manages MySQL database connections and queries.
-   - Functions: connect_to_database(), fetch_urls(), update_scrape_history()
-4. utils.py
-   - Utility Functions: Provides helper functions for setting up directories, saving data, mimicking human behavior, and handling images.
-   - Functions: setup_directory(), save_data(), mimic_human_behavior(), download_and_replace_images(), keep_specific_tags()
-5. logging_setup.py
-   - Logging Setup: Configures the logging settings to ensure proper logging throughout the application.
-   - Function: setup_logging()
-"""
+
+
 def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     logger.debug(f'Scraping data from URL: {url}')
     driver.get(url)
@@ -85,7 +72,7 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     beilstein = soup.select_one('div.jss171:nth-of-type(3) span').get_text(strip=True) if soup.select_one(
         'div.jss171:nth-of-type(3) span') else ''
     mdl_number = soup.select_one('div:nth-of-type(4) div.jss173').get_text(strip=True) if soup.select_one(
-        'div:nth-of-type(4) div.jss173') else ''
+        'div.jss173:nth-of-type(4) div.jss173') else ''
     pubchem_substance_id = soup.select_one('.jss173 a[target]').get_text(strip=True) if soup.select_one(
         '.jss173 a[target]') else ''
     nacres = soup.select_one('div.jss171:nth-of-type(6) div:nth-of-type(2)').get_text(strip=True) if soup.select_one(
@@ -143,6 +130,7 @@ def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
         cursor.execute(insert_query, values)
         conn.commit()
 
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     cursor.execute(f"SELECT scrape_history FROM sitemap_prod_us_en_1 WHERE id = %s", (url_id,))
     result = cursor.fetchone()
     if result:
