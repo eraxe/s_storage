@@ -3,45 +3,34 @@ import time
 import requests
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import logging
 from urllib.parse import urljoin
-
 from database import connect_to_database, fetch_urls, update_scrape_history
 from utils import setup_directory, save_data, mimic_human_behavior, download_and_replace_images, keep_specific_tags
+from scraper_conf import db_config, options, service
 from logging_setup import setup_logging
-
+setup_logging()  # Ensure logging is set up once at the start
 logger = logging.getLogger('scraper')
-
-# MySQL connection details
-db_config = {
-    'user': 'sigma',
-    'password': 'password',
-    'host': 'localhost',
-    'port': '3306',
-    'database': 'sigma'
-}
-
-# Selenium configuration
-options = Options()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--disable-gpu")
-options.add_argument("start-maximized")
-options.add_argument("disable-infobars")
-options.add_argument("--disable-extensions")
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_argument(
-    "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-)
-
-service = Service('/home/katana/Projects/selenium/sigma_storage/chrome/driver/chromedriver')
-
-
-def scrape_data(url, attempt_number, url_id, cursor, conn):
+"""
+Project Structure:
+1. scraper.py
+   - Main Script: Orchestrates the scraping process, initializes the WebDriver, and manages the main loop for scraping URLs.
+   - Functions: scrape_data(), main()
+2. scraper_conf.py
+   - Configuration: Contains configuration for MySQL connection, Selenium options, and logging setup.
+   - Variables: db_config, options, service, logger
+3. database.py
+   - Database Operations: Manages MySQL database connections and queries.
+   - Functions: connect_to_database(), fetch_urls(), update_scrape_history()
+4. utils.py
+   - Utility Functions: Provides helper functions for setting up directories, saving data, mimicking human behavior, and handling images.
+   - Functions: setup_directory(), save_data(), mimic_human_behavior(), download_and_replace_images(), keep_specific_tags()
+5. logging_setup.py
+   - Logging Setup: Configures the logging settings to ensure proper logging throughout the application.
+   - Function: setup_logging()
+"""
+def scrape_data(driver, url, attempt_number, url_id, cursor, conn):
     logger.debug(f'Scraping data from URL: {url}')
     driver.get(url)
     time.sleep(5)
@@ -168,7 +157,7 @@ def scrape_data(url, attempt_number, url_id, cursor, conn):
 
 
 def main():
-    setup_logging()
+    setup_logging()  # Ensure logging is set up once at the start
     conn, cursor = connect_to_database(db_config)
     table_name = 'sitemap_prod_us_en_1'
     urls_to_scrape = fetch_urls(cursor, table_name)
@@ -184,7 +173,7 @@ def main():
     for url_id, url in urls_to_scrape:
         try:
             logger.info(f'Scraping URL: {url}')
-            final_url = scrape_data(url, attempt_number, url_id, cursor, conn)
+            final_url = scrape_data(driver, url, attempt_number, url_id, cursor, conn)
             logger.debug(f'URL scraped: {final_url}')
         except Exception as e:
             logger.error(f"Error scraping {url}: {e}")

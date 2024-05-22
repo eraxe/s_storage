@@ -1,0 +1,35 @@
+# Ignore everything
+*
+
+# Allow specific files and directories
+!.gitignore
+!scraper.py
+!scraper_conf.py
+!database.py
+!utils.py
+!logging_setup.py
+
+# Allow any directories required for the project
+!scrape_data/
+!scraper.log
+
+# Ignore typical files and directories
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
