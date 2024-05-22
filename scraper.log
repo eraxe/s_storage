@@ -2012,3 +2012,40 @@ Stacktrace:
 2024-05-22 10:49:37,827 - INFO - Connected to the MySQL database.
 2024-05-22 10:49:37,955 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/mm/100337
 2024-05-22 10:49:37,955 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/mm/100337
+2024-05-22 10:52:58,488 - DEBUG - PDF content length: 289651 bytes
+2024-05-22 10:52:58,503 - DEBUG - Saving HTML content.
+2024-05-22 10:52:58,504 - DEBUG - Saving PDF content from https://www.sigmaaldrich.com/US/en/specification-sheet/SPEC/MDA/CHEM/1.00337/1003371000.
+2024-05-22 10:52:58,508 - DEBUG - image_url: https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/320/636/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50/640/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50.jpg
+2024-05-22 10:52:58,625 - DEBUG - Downloading image from https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/320/636/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50/640/fd99fee2-ca59-47b4-a527-bc7ed4e7ee50.jpg
+2024-05-22 10:53:00,368 - DEBUG - Saved image to scrape_data/attempt_23/url_129/images/100337.png
+2024-05-22 10:53:00,461 - DEBUG - URL scraped: https://www.sigmaaldrich.com/US/en/product/mm/100337
+2024-05-22 10:53:00,461 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/mm/132381
+2024-05-22 10:53:00,461 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/mm/132381
+2024-05-22 10:53:19,065 - DEBUG - Saving HTML content.
+2024-05-22 10:53:19,069 - DEBUG - image_url: https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/207/895/11e08e5b-cc52-4ef8-a3ad-7f94d6387173/640/11e08e5b-cc52-4ef8-a3ad-7f94d6387173.jpg
+2024-05-22 10:53:19,208 - DEBUG - Downloading image from https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/207/895/11e08e5b-cc52-4ef8-a3ad-7f94d6387173/640/11e08e5b-cc52-4ef8-a3ad-7f94d6387173.jpg
+2024-05-22 10:53:21,621 - DEBUG - Saved image to scrape_data/attempt_23/url_130/images/132381.png
+2024-05-22 10:53:21,661 - DEBUG - URL scraped: https://www.sigmaaldrich.com/US/en/product/mm/132381
+2024-05-22 10:53:21,661 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/mm/crk1f3006
+2024-05-22 10:53:21,661 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/mm/crk1f3006
+2024-05-22 10:53:34,470 - DEBUG - Saving HTML content.
+2024-05-22 10:53:34,475 - DEBUG - image_url: https://www.sigmaaldrich.com/assets/images/millipore-no-image/millipore-no-image_w640.png
+2024-05-22 10:53:34,542 - DEBUG - Downloading image from https://www.sigmaaldrich.com/assets/images/millipore-no-image/millipore-no-image_w640.png
+2024-05-22 10:53:37,523 - DEBUG - Saved image to scrape_data/attempt_23/url_131/images/crk1f3006.png
+2024-05-22 10:53:37,616 - DEBUG - URL scraped: https://www.sigmaaldrich.com/US/en/product/mm/crk1f3006
+2024-05-22 10:53:37,616 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/sial/07533
+2024-05-22 10:53:37,616 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/sial/07533
+2024-05-22 10:53:53,402 - DEBUG - Saving HTML content.
+2024-05-22 10:53:53,406 - DEBUG - image_url: https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/331/323/29b3df9b-a70d-4d89-943a-f855ec1be146/640/29b3df9b-a70d-4d89-943a-f855ec1be146.jpg
+2024-05-22 10:53:53,567 - DEBUG - Downloading image from https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/331/323/29b3df9b-a70d-4d89-943a-f855ec1be146/640/29b3df9b-a70d-4d89-943a-f855ec1be146.jpg
+2024-05-22 10:53:55,409 - DEBUG - Saved image to scrape_data/attempt_23/url_132/images/07533.png
+2024-05-22 10:53:55,472 - DEBUG - URL scraped: https://www.sigmaaldrich.com/US/en/product/sial/07533
+2024-05-22 10:53:55,473 - INFO - Scraping URL: https://www.sigmaaldrich.com/US/en/product/sigma/c6079
+2024-05-22 10:53:55,473 - DEBUG - Scraping data from URL: https://www.sigmaaldrich.com/US/en/product/sigma/c6079
+2024-05-22 10:54:12,283 - DEBUG - PDF content length: 29638 bytes
+2024-05-22 10:54:12,290 - DEBUG - Saving HTML content.
+2024-05-22 10:54:12,292 - DEBUG - Saving PDF content from https://www.sigmaaldrich.com/specification-sheets/281/179/C6079-BULK.pdf.
+2024-05-22 10:54:12,296 - DEBUG - image_url: https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/368/691/554e49d7-c733-4cf3-b87f-d2ef798fc0b0/640/554e49d7-c733-4cf3-b87f-d2ef798fc0b0.jpg
+2024-05-22 10:54:12,466 - DEBUG - Downloading image from https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/368/691/554e49d7-c733-4cf3-b87f-d2ef798fc0b0/640/554e49d7-c733-4cf3-b87f-d2ef798fc0b0.jpg
+2024-05-22 10:54:14,016 - DEBUG - Saved image to scrape_data/attempt_23/url_133/images/c6079.png
+2024-05-22 10:54:14,111 - DEBUG - URL scraped: https://www.sigmaaldrich.com/US/en/product/sigma/c6079
