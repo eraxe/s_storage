@@ -3,7 +3,7 @@ import logging
 from selenium import webdriver
 from database import connect_to_database, fetch_urls
 from scraper_conf import db_config, options, service
-from logging_setup import setup_logging
+from setup import setup_logging
 from function import scrape_data
 
 setup_logging()  # Ensure logging is set up once at the start

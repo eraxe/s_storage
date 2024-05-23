@@ -7,7 +7,7 @@
 !scraper_conf.py
 !database.py
 !utils.py
-!logging_setup.py
+!setup.py
 
 # Ignore typical files and directories
 # Virtual environments
