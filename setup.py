@@ -2,7 +2,6 @@ import logging
 import json
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-from urllib.parse import urljoin
 
 
 def setup_logging():

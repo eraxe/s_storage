@@ -101,3 +101,4 @@ def download_and_replace_safety_images(soup, headers):
     table_html += '</table>'
     return table_html
 
+
